@@ -32,7 +32,7 @@ export class MainComponent implements AfterViewInit, OnInit {
   passwordIsCopied = signal(false);
   passwordIsCopiedText = signal('copy');
 
-  checkboxState = signal<CheckboxState>({
+  checkboxState = signal({
     includeLetters: false,
     includeNumbers: false,
     includeSymbols: false,
@@ -77,7 +77,7 @@ export class MainComponent implements AfterViewInit, OnInit {
 
   // Fully reloads the app when clicking the title
   resetApp() {
-    window.location.reload();
+    history.go();
   }
 
   // Handles password length input: updates the password length with validation
@@ -90,7 +90,9 @@ export class MainComponent implements AfterViewInit, OnInit {
     // (a non-zero digit followed by any number of digits).
     if (/^[1-9]\d*$/.test(inputValue)) {
       const inputValueInt = parseInt(inputValue, 10);
-      this.passwordLength.set(inputValueInt);
+      inputValueInt <= 100
+        ? this.passwordLength.set(inputValueInt)
+        : this.passwordLength.set(0);
     } else {
       this.passwordLength.set(0);
     }

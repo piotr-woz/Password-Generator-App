@@ -52,7 +52,7 @@
 
     <div>
       <button class="generate-button main-box__button"
-        [disabled]="!(passwordLength() !== 0 && passwordLength() <= 100 && (checkboxState().includeLetters || checkboxState().includeNumbers || checkboxState().includeSymbols))"
+        [disabled]="!(passwordLength() !== 0 && (checkboxState().includeLetters || checkboxState().includeNumbers || checkboxState().includeSymbols))"
         (click)="onGeneratePassword()">Generate!</button>
     </div>
 
