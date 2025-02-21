@@ -24,5 +24,6 @@ This project was generated with **Angular - version 19.1.0.** ([Angular CLI link
 * Typescript 5.7.2
 * HTML5
 * SASS 1.83.1
+* Jasmine 5.5.0 and Karma 6.4.4 with 100% unit test coverage
 
 The application is built using modern Angular features such as signals, the new control flow syntax, and more.

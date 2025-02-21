@@ -17,7 +17,7 @@
   height: 100vh;
   @include dark-overlay;
   backdrop-filter: blur(6px);
-  animation: hide 2.2s forwards;
+  animation: hide 2s forwards;
   &--paused {
     animation-play-state: paused;
   }
@@ -46,7 +46,8 @@
   gap: 1rem;
   padding: 1rem;
 
-  &__char {
+  &__char1,
+  &__char2 {
     display: inline-block;
     position: relative;
     width: 1ch;
@@ -69,8 +70,10 @@
     &:nth-child(even)::after {
       animation: shuffleCharsEven 3s forwards;
     }
+  }
 
-    @for $i from 1 through 9 {
+  &__char1 {
+    @for $i from 1 through 8 {
       // Generates a random delay for a given character
       $delay: math.random() * 1s;
 
@@ -80,6 +83,19 @@
       }
 
       // Sets the color change animation with the same delay
+      &:nth-child(#{$i}) {
+        animation: revealText 3s forwards;
+        animation-delay: #{$delay};
+      }
+    }
+  }
+
+  &__char2 {
+    @for $i from 1 through 9 {
+      $delay: math.random() * 1s;
+      &:nth-child(#{$i})::after {
+        animation-delay: #{$delay};
+      }
       &:nth-child(#{$i}) {
         animation: revealText 3s forwards;
         animation-delay: #{$delay};

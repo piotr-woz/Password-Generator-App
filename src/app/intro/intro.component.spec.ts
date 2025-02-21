@@ -94,7 +94,7 @@ describe('IntroComponent', () => {
       expect(charBoxes.length).toBe(2);
 
       const firstBoxChars =
-        charBoxes[0].nativeElement.querySelectorAll('.char-box__char');
+        charBoxes[0].nativeElement.querySelectorAll('.char-box__char1');
       expect(firstBoxChars.length).toBe(8);
       expect(firstBoxChars[0].textContent).toBe('P');
       expect(firstBoxChars[1].textContent).toBe('a');
@@ -106,7 +106,7 @@ describe('IntroComponent', () => {
       expect(firstBoxChars[7].textContent).toBe('d');
 
       const secondBoxChars =
-        charBoxes[1].nativeElement.querySelectorAll('.char-box__char');
+        charBoxes[1].nativeElement.querySelectorAll('.char-box__char2');
       expect(secondBoxChars.length).toBe(9);
       expect(secondBoxChars[0].textContent).toBe('G');
       expect(secondBoxChars[1].textContent).toBe('e');
