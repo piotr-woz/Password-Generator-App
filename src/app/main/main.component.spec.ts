@@ -83,7 +83,7 @@ describe('MainComponent', () => {
     });
   });
 
-  describe('ngAfterViewInit', () => {
+  describe('ngAfterViewInit()', () => {
     let component: MainComponent;
     let rendererMock: jasmine.SpyObj<Renderer2>;
     let elementRefMock: ElementRef;
@@ -146,23 +146,29 @@ describe('MainComponent', () => {
   });
 
   describe('onEnterPasswordLength()', () => {
+    it('should set password length to 0 if input is empty', () => {
+      const event = { target: { value: '' } } as unknown as InputEvent;
+      component.onEnterPasswordLength(event);
+      expect(component.passwordLength()).toBe(0);
+    });
+
     it('should set password length if valid input is provided', () => {
-      const event = { target: { value: '10' } } as unknown as Event;
+      const event = { target: { value: '10' } } as unknown as InputEvent;
       component.onEnterPasswordLength(event);
       expect(component.passwordLength()).toBe(10);
     });
 
     it('should not set password length if invalid input is provided', () => {
-      let event = { target: { value: '101' } } as unknown as Event;
+      let event = { target: { value: '101' } } as unknown as InputEvent;
       component.onEnterPasswordLength(event);
       expect(component.passwordLength()).toBe(0);
-      event = { target: { value: '-1' } } as unknown as Event;
+      event = { target: { value: '-1' } } as unknown as InputEvent;
       component.onEnterPasswordLength(event);
       expect(component.passwordLength()).toBe(0);
-      event = { target: { value: '010' } } as unknown as Event;
+      event = { target: { value: '010' } } as unknown as InputEvent;
       component.onEnterPasswordLength(event);
       expect(component.passwordLength()).toBe(0);
-      event = { target: { value: 'abc' } } as unknown as Event;
+      event = { target: { value: 'abc' } } as unknown as InputEvent;
       component.onEnterPasswordLength(event);
       expect(component.passwordLength()).toBe(0);
     });
@@ -180,9 +186,9 @@ describe('MainComponent', () => {
 
   describe('onClearPasswordLength()', () => {
     it('should clear password and input fields', () => {
-      component.inputValue.set('4');
-      component.passwordLength.set(4);
-      component.password.set('test');
+      component.inputValue.set('8');
+      component.passwordLength.set(8);
+      component.password.set('password');
       component.onClearPasswordLength();
       expect(component.inputValue()).toBe('');
       expect(component.passwordLength()).toBe(0);
@@ -190,7 +196,41 @@ describe('MainComponent', () => {
     });
   });
 
-  describe('onChangeCheckboxState', () => {
+  describe('onChangePasswordLength()', () => {
+    it('should increment password length by 1 when add button is clicked', () => {
+      const event = {
+        currentTarget: { dataset: { count: 'add' } },
+      } as unknown as Event;
+      component.passwordLength.set(5);
+      component.onChangePasswordLength(event);
+      expect(component.passwordLength()).toBe(6);
+      component.passwordLength.set(100);
+      component.onChangePasswordLength(event);
+      expect(component.passwordLength()).toBe(100);
+    });
+
+    it('should decrement password length by 1 when subtract button is clicked', () => {
+      const event = {
+        currentTarget: { dataset: { count: 'subtract' } },
+      } as unknown as Event;
+      component.passwordLength.set(5);
+      component.onChangePasswordLength(event);
+      expect(component.passwordLength()).toBe(4);
+      component.passwordLength.set(0);
+      component.onChangePasswordLength(event);
+      expect(component.passwordLength()).toBe(0);
+    });
+
+    it('should set password length to predefined values when button is clicked', () => {
+      const event = {
+        currentTarget: { dataset: { count: '5' } },
+      } as unknown as Event;
+      component.onChangePasswordLength(event);
+      expect(component.passwordLength()).toBe(5);
+    });
+  });
+
+  describe('onChangeCheckboxState()', () => {
     it('should toggle checkbox state and save to sessionStorage', () => {
       spyOn(sessionStorage, 'setItem');
       component.onChangeCheckboxState('Letters');
@@ -200,9 +240,25 @@ describe('MainComponent', () => {
       expect(component.checkboxState().includeLetters).toBeFalse();
       expect(sessionStorage.setItem).toHaveBeenCalled();
     });
+
+    it('should bind checkbox state correctly', () => {
+      spyOn(component, 'checkboxState').and.returnValue({
+        includeLetters: true,
+        includeNumbers: false,
+        includeSymbols: true,
+      });
+      fixture.detectChanges();
+
+      const checkboxes = fixture.debugElement.queryAll(
+        By.css('.checkbox__input')
+      );
+      expect(checkboxes[0].nativeElement.checked).toBeTrue();
+      expect(checkboxes[1].nativeElement.checked).toBeFalse();
+      expect(checkboxes[2].nativeElement.checked).toBeTrue();
+    });
   });
 
-  describe('shuffleString', () => {
+  describe('shuffleString()', () => {
     it('should shuffle string correctly', () => {
       const input = 'abcdef';
       const shuffled = component.shuffleString(input);
@@ -258,22 +314,61 @@ describe('MainComponent', () => {
     });
 
     describe('onCopyToClipboard()', () => {
+      beforeEach(() => {
+        component.password.set('TestPassword123');
+      });
+
       it('should copy the password to the clipboard and update the UI state accordingly', fakeAsync(() => {
         spyOn(navigator.clipboard, 'writeText').and.returnValue(
           Promise.resolve()
         );
-        component.password.set('TestPassword123');
         component.onCopyToClipboard();
+
         tick();
+        fixture.detectChanges();
+        const copyButton: HTMLButtonElement = fixture.debugElement.query(
+          By.css('.copy-button')
+        ).nativeElement;
+        const inputPassword: HTMLInputElement = fixture.debugElement.query(
+          By.css('.input-password')
+        ).nativeElement;
+        expect(copyButton.classList).toContain('copy-button--copied');
+        expect(inputPassword.classList).toContain('input-password--copied');
         expect(navigator.clipboard.writeText).toHaveBeenCalledWith(
           'TestPassword123'
         );
         expect(component.passwordIsCopied()).toBeTrue();
         expect(component.passwordIsCopiedText()).toEqual('copied');
+
         tick(1000);
+        fixture.detectChanges();
+        expect(copyButton.classList).toContain('copy-button--not-copied');
+        expect(inputPassword.classList).not.toContain('input-password--copied');
         expect(component.passwordIsCopied()).toBeFalse();
         expect(component.passwordIsCopiedText()).toEqual('copy');
       }));
+
+      it('catches error when clipboard writeText fails', fakeAsync(() => {
+        spyOn(navigator.clipboard, 'writeText').and.returnValue(
+          Promise.reject('Error')
+        );
+        spyOn(console, 'error');
+        component.onCopyToClipboard();
+        tick();
+        expect(console.error).toHaveBeenCalled();
+      }));
+    });
+
+    describe('input with password', () => {
+      it('should bind password correctly', () => {
+        spyOn(component, 'password').and.returnValue('expected password');
+        fixture.detectChanges();
+
+        const inputPassword: HTMLInputElement = fixture.debugElement.query(
+          By.css('.input-password')
+        ).nativeElement;
+        expect(inputPassword.value).toBe('expected password');
+      });
     });
   });
 });
