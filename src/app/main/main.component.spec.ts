@@ -6,6 +6,7 @@ import {
 } from '@angular/core/testing';
 import { MainComponent } from './main.component';
 import { By } from '@angular/platform-browser';
+import { Renderer2, ElementRef } from '@angular/core';
 
 describe('MainComponent', () => {
   let component: MainComponent;
@@ -47,6 +48,10 @@ describe('MainComponent', () => {
   });
 
   describe('ngOnInit()', () => {
+    afterEach(() => {
+      sessionStorage.clear();
+    });
+
     it('should load checkbox state from sessionStorage', () => {
       spyOn(sessionStorage, 'getItem').and.returnValue(
         JSON.stringify({
@@ -75,6 +80,68 @@ describe('MainComponent', () => {
         'checkboxState',
         jasmine.any(String)
       );
+    });
+  });
+
+  describe('ngAfterViewInit', () => {
+    let component: MainComponent;
+    let rendererMock: jasmine.SpyObj<Renderer2>;
+    let elementRefMock: ElementRef;
+
+    beforeEach(() => {
+      rendererMock = jasmine.createSpyObj('Renderer2', ['listen']);
+      elementRefMock = {
+        nativeElement: document.createElement('div'),
+      };
+
+      rendererMock.listen.and.callFake((target, eventName, callback) => {
+        if (target === 'document' && eventName === 'keydown') {
+          document.addEventListener('keydown', callback as EventListener);
+        }
+        return () =>
+          document.removeEventListener('keydown', callback as EventListener);
+      });
+
+      component = new MainComponent(rendererMock, elementRefMock);
+    });
+
+    afterEach(() => {
+      rendererMock.listen.calls.reset();
+    });
+
+    it('should focus and click the generate button when Enter is pressed', () => {
+      const button = document.createElement('button');
+      button.classList.add('generate-button');
+      elementRefMock.nativeElement.appendChild(button);
+      spyOn(button, 'focus');
+      spyOn(button, 'click');
+
+      component.ngAfterViewInit();
+
+      const event = new KeyboardEvent('keydown', { key: 'Enter' });
+      document.dispatchEvent(event);
+
+      expect(button.focus).toHaveBeenCalled();
+      expect(button.click).toHaveBeenCalled();
+    });
+
+    it('should reload the app when Escape is pressed', () => {
+      spyOn(history, 'go');
+
+      component.ngAfterViewInit();
+
+      const event = new KeyboardEvent('keydown', { key: 'Escape' });
+      document.dispatchEvent(event);
+
+      expect(history.go).toHaveBeenCalled();
+    });
+  });
+
+  describe('resetApp()', () => {
+    it('should reload the app', () => {
+      spyOn(history, 'go');
+      component.resetApp();
+      expect(history.go).toHaveBeenCalled();
     });
   });
 
