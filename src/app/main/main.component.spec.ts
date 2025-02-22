@@ -322,7 +322,14 @@ describe('MainComponent', () => {
         spyOn(navigator.clipboard, 'writeText').and.returnValue(
           Promise.resolve()
         );
+        // First option
         component.onCopyToClipboard();
+
+        // Second option - click the copy button
+        // const copyButton: HTMLButtonElement = fixture.debugElement.query(
+        //   By.css('.copy-button')
+        // ).nativeElement;
+        // copyButton.click();
 
         tick();
         fixture.detectChanges();
