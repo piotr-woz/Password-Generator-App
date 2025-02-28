@@ -30,7 +30,6 @@ export class MainComponent implements AfterViewInit, OnInit {
   buttonsWithNumbers = numbersArray;
   password = signal('');
   passwordIsCopied = signal(false);
-  passwordIsCopiedText = signal('copy');
 
   checkboxState = signal({
     includeLetters: false,
@@ -181,10 +180,8 @@ export class MainComponent implements AfterViewInit, OnInit {
       .writeText(this.password())
       .then(() => {
         this.passwordIsCopied.set(true);
-        this.passwordIsCopiedText.set('copied');
         setTimeout(() => {
           this.passwordIsCopied.set(false);
-          this.passwordIsCopiedText.set('copy');
         }, 1000);
       })
       .catch((err) => {

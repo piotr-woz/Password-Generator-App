@@ -41,10 +41,6 @@ describe('MainComponent', () => {
       expect(component.checkboxState().includeNumbers).toBeFalse();
       expect(component.checkboxState().includeSymbols).toBeFalse();
     });
-
-    it('should initially return "copy" - passwordIsCopiedText', () => {
-      expect(component.passwordIsCopiedText()).toEqual('copy');
-    });
   });
 
   describe('ngOnInit()', () => {
@@ -345,14 +341,12 @@ describe('MainComponent', () => {
           'TestPassword123'
         );
         expect(component.passwordIsCopied()).toBeTrue();
-        expect(component.passwordIsCopiedText()).toEqual('copied');
 
         tick(1000);
         fixture.detectChanges();
         expect(copyButton.classList).toContain('copy-button--not-copied');
         expect(inputPassword.classList).not.toContain('input-password--copied');
         expect(component.passwordIsCopied()).toBeFalse();
-        expect(component.passwordIsCopiedText()).toEqual('copy');
       }));
 
       it('catches error when clipboard writeText fails', fakeAsync(() => {

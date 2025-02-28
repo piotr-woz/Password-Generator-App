@@ -63,7 +63,7 @@
         <button class="copy-button password-box__button"
           [ngClass]="passwordIsCopied() ? 'copy-button--copied' : 'copy-button--not-copied'"
           (click)="onCopyToClipboard()">
-          <p>{{ passwordIsCopiedText() }}</p>
+          <p>{{ passwordIsCopied() ? "copied" : "copy" }}</p>
           <mat-icon>content_copy</mat-icon>
         </button>
       </div>
