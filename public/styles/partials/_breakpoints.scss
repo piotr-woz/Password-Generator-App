@@ -4,14 +4,14 @@ $mobile: 768px;
 
 // Applies styles for portrait orientation with a max width breakpoint
 @mixin view-max-portrait($breakpoint) {
-  @media (orientation: portrait) and (max-width: #{$breakpoint - 1px}) {
+  @media screen and (orientation: portrait) and (max-width: #{$breakpoint - 1px}) {
     @content;
   }
 }
 
 // Applies styles for a max width breakpoint
 @mixin view-max($breakpoint) {
-  @media (max-width: #{$breakpoint - 1px}) {
+  @media screen and (max-width: #{$breakpoint - 1px}) {
     @content;
   }
 }
